@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Espelho de oceanDeep (lib/ui/theme/cores.dart), usado no fundo da janela antes do Flutter desenhar -->
+    <color name="ocean_deep">#FF031B34</color>
+</resources>
