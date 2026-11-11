@@ -29,6 +29,11 @@ O **app mobile já existe** em Flutter. Ele foi migrado de Kotlin/Jetpack Compos
 
 O código é cuidadoso, mas o desenho não protege nada fora do aparelho. Ao implementar a API, **a autenticação e os dados saem do app**, seguindo a lista de correções do `ARQUITETURA_C4.md` (seção 8). Nunca acrescente novas regras de segurança ou novos dados persistentes no aparelho.
 
+**Entregas já feitas:** 1 (requisitos, modelo de dados e ADRs iniciais) e 2 (camadas do app). Antes de começar qualquer entrega, leia:
+- `docs/REQUISITOS.md`: critérios de aceite, recorte do MVP e decisões de produto em aberto;
+- `docs/MODELO_DADOS.md`: tabelas, restrições e o módulo dono de cada uma;
+- `docs/adr/`: decisões tomadas (status "Aceito") e propostas. Não implemente um ADR "Proposto" como se estivesse aceito; pergunte.
+
 ## Stack
 
 - **Backend:** Node.js 22 LTS + TypeScript, NestJS (ou Fastify, se eu pedir), ORM Prisma

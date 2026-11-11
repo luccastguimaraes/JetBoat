@@ -2,11 +2,11 @@
 
 Mapa da arquitetura do JetBoat nos quatro níveis do modelo C4: **contexto → containers → componentes → código**. O documento mostra o que existe hoje (**atual**), onde queremos chegar (**alvo**) e a lista de correções para ir de um ao outro.
 
-**Última revisão:** 11/11/2026 · **Relacionados:** [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) (a seção 13 mostra onde o design system fica nesta arquitetura) · ADRs em `docs/adr/` (a criar)
+**Última revisão:** 11/11/2026 · **Relacionados:** [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) (a seção 13 mostra onde o design system fica nesta arquitetura) · [`REQUISITOS.md`](REQUISITOS.md) · [`MODELO_DADOS.md`](MODELO_DADOS.md) · [ADRs em `adr/`](adr/README.md)
 
 > **Como manter:** toda mudança que crie ou remova um container, um componente ou uma pasta de `lib/` atualiza este arquivo no mesmo PR. Os diagramas são Mermaid e aparecem renderizados no GitHub, no VS Code (extensão Markdown Preview Mermaid) e no Android Studio (plugin Mermaid).
 
-**Sumário:** [1. Situação atual](#1-situação-atual) · [2. Nível 1 — Contexto](#2-nível-1--contexto-alvo) · [3. Nível 2 — Containers](#3-nível-2--containers-alvo) · [4. Nível 3 — Componentes do app](#4-nível-3--componentes-do-app-mobile-alvo) · [5. Nível 3 — Componentes da API](#5-nível-3--componentes-da-api-alvo) · [6. Nível 4 — Código](#6-nível-4--código-do-app-alvo) · [7. Regras de dependência](#7-regras-de-dependência) · [8. Correções](#8-correções-do-atual-para-o-alvo) · [9. Decisões em aberto](#9-decisões-em-aberto) · [10. Histórico](#10-histórico)
+**Sumário:** [1. Situação atual](#1-situação-atual) · [2. Nível 1 — Contexto](#2-nível-1--contexto-alvo) · [3. Nível 2 — Containers](#3-nível-2--containers-alvo) · [4. Nível 3 — Componentes do app](#4-nível-3--componentes-do-app-mobile-alvo) · [5. Nível 3 — Componentes da API](#5-nível-3--componentes-da-api-alvo) · [6. Nível 4 — Código](#6-nível-4--código-do-app-alvo) · [7. Regras de dependência](#7-regras-de-dependência) · [8. Correções](#8-correções-do-atual-para-o-alvo) · [9. Decisões](#9-decisões) · [10. Histórico](#10-histórico)
 
 ---
 
@@ -252,7 +252,7 @@ Ordem sugerida: cada bloco termina com `flutter analyze` sem avisos, `flutter te
 | A2 | Trocar `AutenticacaoLocal` por `AutenticacaoApi`, que só chama a API e guarda os tokens. Remover a emissão e a validação de JWT no aparelho | `data/auth/autenticacao_local.dart`, `jwt.dart`, `assinador.dart` | pendente (depende de A1) |
 | A3 | Levar o bloqueio por tentativas para a API (resposta 429 com `Retry-After`). O app só mostra o tempo restante | `autenticacao_local.dart` (`_falhas`, `_bloqueadoAte`) | pendente (depende de A1) |
 | A4 | Parar de circular hash e salt pela interface: a `Sessao` passa a carregar um `Perfil`, não o `Usuario` com `senhaHash` | `domain/conta/perfil.dart`, `resultados.dart` | ✅ feito: `Usuario` (com hash) só existe dentro de `data/` |
-| A5 | Decidir a migração das contas locais (seção 9) e apagar o `usuarios.json` e a chave HMAC do aparelho depois de migrar | `repositorio_usuarios_arquivo.dart`, `assinador.dart` | pendente |
+| A5 | Apagar o `usuarios.json`, a chave HMAC e os tokens locais na primeira abertura da versão com API e pedir novo cadastro ([ADR 0005](adr/0005-migracao-contas-locais.md)) | `repositorio_usuarios_arquivo.dart`, `assinador.dart` | pendente |
 
 ### B. Camadas do app (prioridade média)
 
@@ -276,13 +276,18 @@ Ordem sugerida: cada bloco termina com `flutter analyze` sem avisos, `flutter te
 
 ---
 
-## 9. Decisões em aberto
+## 9. Decisões
 
-| Decisão | Opções | Observação |
+As decisões ficam registradas como ADRs em [`docs/adr/`](adr/README.md). As de produto ainda em aberto (gateway, prazos, valores) estão na seção 5 do [`REQUISITOS.md`](REQUISITOS.md).
+
+| Decisão | Resultado | ADR |
 |---|---|---|
-| Contas criadas só no aparelho | (a) pedir novo cadastro; (b) no primeiro login, o app envia e-mail e senha para a API, que cria a conta com Argon2id | Não há como migrar as contas sem a senha, porque o hash PBKDF2 está só no celular. Com poucos usuários de teste, (a) é mais simples |
-| Validade do refresh token | 7 dias (como hoje no app) ou 30 dias (como no prompt de desenvolvimento) | Registrar em ADR |
-| Gerência de estado | manter `StatefulWidget` + callbacks, ou adotar Riverpod | Registrar em ADR antes de mudar |
+| Contas criadas só no aparelho | **Aceito:** pedir novo cadastro; o app apaga os dados locais na primeira abertura da versão com API | [0005](adr/0005-migracao-contas-locais.md) |
+| Validade do refresh token | **Aceito:** 30 dias, opaco, hash no banco, rotação e revogação da família no reuso | [0004](adr/0004-validade-refresh-token.md) |
+| Gerência de estado | **Proposto:** manter `StatefulWidget` até a Entrega 6; adotar Riverpod na Entrega 7 | [0006](adr/0006-gerencia-de-estado.md) |
+| Concorrência das agendas | **Proposto:** tabela única `ocupacoes` com exclusion constraint; cotas criadas de uma vez e reservadas com `UPDATE` condicional | [0001](adr/0001-concorrencia-das-agendas.md) |
+| Rodízio da alta temporada | **Proposto:** janela de pedidos + escolha em rodadas com ordem rotativa | [0002](adr/0002-rodizio-alta-temporada.md) |
+| Cobrança recorrente | **Proposto:** faturas geradas pelo worker + cobrança avulsa no gateway; gateway em aberto | [0003](adr/0003-cobranca-recorrente.md) |
 
 ---
 
@@ -292,3 +297,4 @@ Ordem sugerida: cada bloco termina com `flutter analyze` sem avisos, `flutter te
 |---|---|
 | 11/11/2026 | Criado: situação atual (um container, autenticação no aparelho), diagramas C4 alvo dos níveis 1 a 3, estrutura de código alvo, regras de dependência e lista de correções. |
 | 11/11/2026 | Código alinhado ao nível 4 (seção 6): feitos B1, B2, B3, B4 (parte 1), B6 e A4. Seção 1.2 passou a mostrar o código atual; seções 7 e 8 ganharam status e a lista do que o teste de arquitetura verifica. |
+| 11/11/2026 | Entrega 1 e fim da Entrega 2: B7 feito; criados `REQUISITOS.md`, `MODELO_DADOS.md` e os ADRs 0001 a 0006. Seção 9 passou a listar as decisões com o ADR de cada uma. |

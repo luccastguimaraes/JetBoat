@@ -238,6 +238,9 @@ As regras entre as pastas (por exemplo, "telas não importam `lib/data/`") são 
 | Documento | Para quê |
 |---|---|
 | [`docs/ARQUITETURA_C4.md`](docs/ARQUITETURA_C4.md) | arquitetura nos 4 níveis do C4: situação atual, alvo, regras de dependência e lista de correções com status |
+| [`docs/REQUISITOS.md`](docs/REQUISITOS.md) | requisitos funcionais e não funcionais com critérios de aceite, prioridade (MVP ou Fase 2), situação atual e decisões em aberto |
+| [`docs/MODELO_DADOS.md`](docs/MODELO_DADOS.md) | modelo do banco da futura API: diagrama ER, restrições, índices e módulo dono de cada tabela |
+| [`docs/adr/`](docs/adr/README.md) | decisões de arquitetura (ADRs): concorrência das agendas, rodízio da alta temporada, cobrança recorrente, refresh token, contas locais e gerência de estado |
 | [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | cores, tipografia, espaçamento, elevação, iconografia, movimento, widgets, checklist de revisão e o que falta definir |
 | [`docs/PROMPT_DESIGN_SYSTEM_JETBOAT.md`](docs/PROMPT_DESIGN_SYSTEM_JETBOAT.md) | prompt para pedir telas novas ao Claude seguindo o design system e a arquitetura |
 | [`docs/prompts/`](docs/prompts/) | prompts de design (área Design do Claude) e de sistema e desenvolvimento (requisitos da plataforma completa) |
