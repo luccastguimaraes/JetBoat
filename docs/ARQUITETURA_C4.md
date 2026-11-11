@@ -264,7 +264,7 @@ Ordem sugerida: cada bloco termina com `flutter analyze` sem avisos, `flutter te
 | B4 | Tirar `Dependencias` de `app.dart` para `dependencias.dart`, com a URL da API vinda de `--dart-define` (dev, homologação, produção) | `dependencias.dart` | ✅ parte 1 feita; a URL entra com a API (B5) |
 | B5 | Criar `data/api/api_cliente.dart` (Dio) com interceptor que renova o token em 401, uma renovação por vez (`Fila`) | novo | pendente (depende de A1) |
 | B6 | Criar `test/arquitetura_test.dart` com as regras da seção 7 | `test/arquitetura_test.dart` | ✅ feito (9 verificações; seção 7) |
-| B7 | Nos testes de tela, trocar o repositório real por um `Autenticacao` falso | `test/tela_*_test.dart`, `test/util.dart` | pendente |
+| B7 | Nos testes de tela, trocar o repositório real por um `Autenticacao` falso | `test/autenticacao_falsa.dart`, `test/tela_login_test.dart`, `test/tela_cadastro_test.dart` | ✅ feito |
 
 ### C. Funcionalidades pendentes (prioridade baixa)
 

@@ -221,7 +221,7 @@ Os valores de todos os tokens estão no `DESIGN_SYSTEM.md`. Siga-o à risca. Se 
 | Movimento | `lib/ui/theme/movimento.dart` (`Movimento`) |
 | Widgets | `lib/ui/components/componentes.dart` (`fundoOceano`, `TelaBase`, `BotaoPrincipal`, `BotaoSecundario`, `BotaoVoltar`, `CabecalhoTela`, `CartaoVidro`, `RotuloSecao`, `Aviso`, `mostrarMensagem`, `context.texto`) |
 | Campos | `lib/ui/components/campos.dart` (`CampoTexto`, `CampoSenha`) |
-| Máscaras | `lib/ui/cadastro/mascara.dart` |
+| Máscaras | `lib/ui/components/mascara.dart` |
 | Rotas e transição | `lib/app.dart` (`Rotas`, `_rota`, `_RotaFade`) |
 | Telas | uma pasta por tela em `lib/ui/` |
 
