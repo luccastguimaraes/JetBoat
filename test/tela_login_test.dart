@@ -1,49 +1,25 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
-import 'package:jetboat/data/auth/armazenamento_seguro.dart';
-import 'package:jetboat/data/auth/assinador.dart';
-import 'package:jetboat/data/auth/autenticacao_local.dart';
 import 'package:jetboat/domain/conta/autenticacao.dart';
-import 'package:jetboat/data/auth/jwt.dart';
-import 'package:jetboat/data/auth/sessao_armazenamento.dart';
-import 'package:jetboat/data/repositorio_usuarios_arquivo.dart';
 import 'package:jetboat/ui/components/componentes.dart';
 import 'package:jetboat/ui/login/tela_login.dart';
 
+import 'autenticacao_falsa.dart';
 import 'util.dart';
 
 typedef K = TelaLoginChaves;
 
 void main() {
-  late Directory pasta;
-  late AutenticacaoLocal auth;
+  late AutenticacaoFalsa auth;
   Sessao? sessao;
   late int voltou;
   late int cadastrar;
 
-  setUp(() async {
-    pasta = Directory.systemTemp.createTempSync('jetboat_login_');
-    final usuarios = RepositorioUsuariosArquivo(File('${pasta.path}/usuarios.json'));
-    await usuarios.cadastrar(
-      nome: 'Maria da Silva',
-      cpf: '52998224725',
-      dataNascimento: '15/03/1990',
-      telefone: '11987654321',
-      email: 'maria@email.com',
-      senha: 'Barco2026',
-    );
-    auth = AutenticacaoLocal(
-      usuarios: usuarios,
-      jwt: Jwt(AssinadorHmac(List.filled(32, 7))),
-      armazenamento: SessaoArmazenamento(ArmazenamentoEmMemoria()),
-    );
+  setUp(() {
+    auth = AutenticacaoFalsa(contas: {'maria@email.com': 'Barco2026'});
     sessao = null;
     voltou = 0;
     cadastrar = 0;
   });
-
-  tearDown(() => pasta.deleteSync(recursive: true));
 
   Future<void> abrir(WidgetTester tester, {bool sessaoExpirada = false}) async {
     usarTelaDeCelular(tester);
@@ -67,7 +43,8 @@ void main() {
     await abrir(tester);
     await entrarCom(tester, 'maria@email.com', 'Barco2026');
     await esperarAte(tester, () => sessao != null);
-    expect(sessao!.perfil.nome, 'Maria da Silva');
+    expect(sessao!.perfil.email, 'maria@email.com');
+    expect(auth.chamadasEntrar, 1);
   });
 
   testWidgets('senha errada mostra erro genérico', (tester) async {
@@ -79,11 +56,31 @@ void main() {
     expect(sessao, isNull);
   });
 
+  testWidgets('avisa quando restam poucas tentativas', (tester) async {
+    auth.respostaLogin = const CredenciaisInvalidas(1);
+    await abrir(tester);
+    await entrarCom(tester, 'maria@email.com', 'errada123');
+    await esperarAte(tester, () => find.byKey(K.erro).evaluate().isNotEmpty);
+    expect(tester.widget<Aviso>(find.byKey(K.erro)).texto, 'E-mail ou senha incorretos. Resta 1 tentativa.');
+  });
+
+  testWidgets('login bloqueado mostra a contagem no botão e não chama o serviço de novo', (tester) async {
+    auth.respostaLogin = const LoginBloqueado(30);
+    await abrir(tester);
+    await entrarCom(tester, 'maria@email.com', 'errada123');
+    await esperarAte(tester, () => find.text('Tente de novo em 30s').evaluate().isNotEmpty);
+    expect(tester.widget<Aviso>(find.byKey(K.erro)).texto, startsWith('Muitas tentativas'));
+
+    await tocar(tester, find.byKey(K.entrar)); // bloqueado: o toque é ignorado
+    expect(auth.chamadasEntrar, 1);
+  });
+
   testWidgets('campos vazios mostram erros sem chamar o serviço', (tester) async {
     await abrir(tester);
     await tocar(tester, find.byKey(K.entrar));
     expect(find.text('Informe seu e-mail'), findsOneWidget);
     expect(find.text('Informe sua senha'), findsOneWidget);
+    expect(auth.chamadasEntrar, 0);
     expect(sessao, isNull);
   });
 
@@ -95,7 +92,7 @@ void main() {
   testWidgets('botões de navegação', (tester) async {
     await abrir(tester);
     await tocar(tester, find.byKey(K.voltar));
-    await tocar(tester, find.byKey(K.cadastrar));
+    await tocar(tester, find.byKey(K.criarConta));
     expect(voltou, 1);
     expect(cadastrar, 1);
   });

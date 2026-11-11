@@ -106,7 +106,7 @@ void main() {
     testWidgets('Criar conta no login abre o cadastro, e voltar retorna ao início', (tester) async {
       await abrirApp(tester);
       await tocar(tester, find.byKey(TelaInicialChaves.botaoEntrar));
-      await tocar(tester, find.byKey(TelaLoginChaves.cadastrar));
+      await tocar(tester, find.byKey(TelaLoginChaves.criarConta));
       await esperar(tester, tituloCadastro);
       await voltarDoSistema(tester);
       await esperar(tester, titulo);

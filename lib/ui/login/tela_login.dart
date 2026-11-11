@@ -19,7 +19,7 @@ abstract final class TelaLoginChaves {
   static const entrar = ValueKey('login_entrar');
   static const erro = ValueKey('login_erro');
   static const avisoSessao = ValueKey('login_aviso_sessao');
-  static const cadastrar = ValueKey('login_criar_conta');
+  static const criarConta = ValueKey('login_criar_conta');
   static const esqueciSenha = ValueKey('login_esqueci_senha');
 }
 
@@ -206,7 +206,7 @@ class _TelaLoginState extends State<TelaLogin> {
             children: [
               Text('Ainda não tem conta?', style: t.bodyMedium?.copyWith(color: textSecondary)),
               TextButton(
-                key: TelaLoginChaves.cadastrar,
+                key: TelaLoginChaves.criarConta,
                 onPressed: widget.onCriarConta,
                 child: Text(
                   'Criar conta',
