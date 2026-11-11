@@ -1,0 +1,9 @@
+# Fim de linha padronizado (LF) no repositório, em qualquer sistema
+* text=auto eol=lf
+*.bat text eol=crlf
+
+# Binários
+*.png binary
+*.jpg binary
+*.webp binary
+*.jar binary
